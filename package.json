@@ -1,0 +1,23 @@
+{
+  "name": "ts-piper",
+  "module": "index.ts",
+  "type": "module",
+  "author": "Onur Eren Elibol",
+  "license": "CC0-1.0",
+  "version": "0.0.1",
+  "description": "This is a typesafe pipe for TS, but with super helpful predefined methods, it includes almost all the features for arrays, objects and sets.",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:i-void/ts-piper.git"
+  },
+  "bugs": {
+    "url": "https://github.com/i-void/ts-piper/issues"
+  },
+  "homepage": "https://github.com/i-void/ts-piper#readme",
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
