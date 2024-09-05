@@ -108,4 +108,10 @@ describe("Record", () => {
   it("length", () => {
     expect(piper({ a: 1, b: 2, c: 3 }).length().value).toEqual(3);
   })
+  it("find", () => {
+    expect(piper({ a: 1, b: 2, c: 3 }).find(({ value }) => value === 2).value).toEqual([ 'b', 2 ]);
+  })
+  it("findAwait", async () => {
+    expect((await piper({ a: 1, b: 2, c: 3 }).findAwait(async ({ value }) => value === await Promise.resolve(2))).value).toEqual([ 'b', 2 ]);
+  })
 })

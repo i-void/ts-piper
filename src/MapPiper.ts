@@ -191,4 +191,20 @@ export class MapPiper<K, V> extends Piper<Map<K, V>> {
   length() {
     return piper(this.value.size);
   }
+
+  find(fn: MapFn<K, V, boolean>): PiperType<readonly[K, V] | undefined> {
+    const entries = Array.from(this.value.entries());
+    const found = entries.find(([key, value], index) => fn({ key, value }, index)) as readonly [K, V] | undefined;
+    return piper(found)
+  }
+
+  async findAwait(fn: MapFn<K, V, Promise<boolean>>) {
+    const entries = Array.from(this.value.entries());
+    for (let i = 0; i < entries.length; i++) {
+      if (await fn({ key: entries[i][0], value: entries[i][1] }, i)) {
+        return piper(entries[i]);
+      }
+    }
+    return piper(undefined);
+  }
 }

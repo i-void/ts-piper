@@ -109,4 +109,10 @@ describe("Map", () => {
   it("length", () => {
     expect(piper(new Map([['a', 1], ['b', 2], ['c', 3]])).length().value).toEqual(3);
   })
+  it("find", () => {
+    expect(piper(new Map([['a', 1], ['b', 2], ['c', 3]])).find(({ value }) => value > 2).value).toEqual(['c', 3]);
+  })
+  it("findAwait", async () => {
+    expect((await piper(new Map([['a', 1], ['b', 2], ['c', 3]])).findAwait(async ({ value }) => Promise.resolve(value > 2))).value).toEqual(['c', 3]);
+  })
 })

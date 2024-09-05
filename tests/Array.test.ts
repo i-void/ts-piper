@@ -163,6 +163,14 @@ describe("Array", () => {
   it("mapWhenAwait", async () => {
     expect((await piper([1, 2, 3]).mapWhenAwait(x => x > 1, async x => Promise.resolve(x * 2))).value).toEqual([4, 6]);
   })
+  it("find", () => {
+    expect(piper([1, 2, 3]).find(x => x === 2).value).toBe(2);
+    expect(piper([] as number[]).find(x => x === 2).value as undefined).toBe(undefined);
+  })
+  it("findAwait", async () => {
+    expect((await piper([1, 2, 3]).findAwait(async x => Promise.resolve(x === 2))).value).toBe(2);
+    expect((await piper([] as number[]).findAwait(async x => Promise.resolve(x === 2))).value as undefined).toBe(undefined);
+  })
   
   describe("StringArray", () => {
     it("join", () => {

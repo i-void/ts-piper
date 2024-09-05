@@ -10,11 +10,12 @@ export class ArrayPiper<T> extends Piper<Array<T>> {
   }
 
   first() {
-    return piper(this.value[0]);
+    const firstVal = this.value[0];
+    return piper(firstVal as T | undefined);
   }
 
   last() {
-    return piper(this.value[this.value.length - 1]);
+    return piper(this.value[this.value.length - 1] as T | undefined);
   }
 
   map<U>(fn: (value: T, index: number) => U) {
@@ -329,6 +330,19 @@ export class ArrayPiper<T> extends Piper<Array<T>> {
       acc.get(key)!.push(this.value[i]);
     }
     return piper(acc);
+  }
+
+  find(fn: (value: T) => boolean) {
+    return piper(this.value.find(fn));
+  }
+
+  async findAwait(fn: (value: T) => Promise<boolean>) {
+    for (let i = 0; i < this.value.length; i++) {
+      if (await fn(this.value[i])) {
+        return piper(this.value[i]);
+      }
+    }
+    return piper(undefined);
   }
     
   

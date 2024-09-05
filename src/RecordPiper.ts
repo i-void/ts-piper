@@ -197,4 +197,20 @@ export class RecordPiper<V> extends Piper<Record<string, V>> {
   length() {
     return piper(Object.keys(this.value).length);
   }
+
+  find(fn: MapFn<V, boolean>): PiperType<readonly[string, V] | undefined> {
+    const entries = Object.entries(this.value);
+    const found = entries.find(([key, value], index) => fn({ key, value }, index)) as readonly [string, V] | undefined;
+    return piper(found)
+  }
+  
+  async findAwait(fn: MapFn<V, Promise<boolean>>): Promise<PiperType<readonly[string, V] | undefined>> {
+    const entries = Object.entries(this.value);
+    for (let i = 0; i < entries.length; i++) {
+      if (await fn({ key: entries[i][0], value: entries[i][1] }, i)) {
+        return piper(entries[i] as readonly [string, V]);
+      }
+    }
+    return piper(undefined);
+  }
 }

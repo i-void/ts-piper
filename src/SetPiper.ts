@@ -218,6 +218,19 @@ export class SetPiper<T> extends Piper<Set<T>> {
     }
     return piper(result);
   }
+  
+  find(fn: (value: T) => boolean) {
+    return piper(Array.from(this.value).find(fn));
+  }
+
+  async findAwait(fn: (value: T) => Promise<boolean>) {
+    for (const value of this.value) {
+      if (await fn(value)) {
+        return piper(value);
+      }
+    }
+    return piper(undefined);
+  }
 
   [index: number]: PiperType<T>;
 }

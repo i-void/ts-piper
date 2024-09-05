@@ -126,6 +126,12 @@ describe("Set", () => {
   it("get", () => {
     expect(piper(new Set([1, 2, 3]))[2].value).toBe(3);
   })
+  it("find", () => {
+    expect(piper(new Set([1, 2, 3])).find(x => x > 2).value).toBe(3);
+  })
+  it("findAwait", async () => {
+    expect((await piper(new Set([1, 2, 3])).findAwait(async x => x > 2)).value).toBe(3);
+  })
   describe("StringSet", () => {
     it("join", () => {
       expect(piper(new Set(['a', 'b', 'c'])).join(", ").value).toBe("a, b, c");
