@@ -345,7 +345,7 @@ export class ArrayPiper<T> extends Piper<Array<T>> {
     return piper(undefined);
   }
   
-  minBy(fn: (value: T) => any) {
+  minBy(fn: (value: T) => any): PiperType<T> | PiperType<undefined> {
     if (this.value.length === 0) {
       return piper(undefined);
     }
@@ -358,7 +358,7 @@ export class ArrayPiper<T> extends Piper<Array<T>> {
     return piper(min);
   }
 
-  maxBy(fn: (value: T) => any) {
+  maxBy(fn: (value: T) => any): PiperType<T> | PiperType<undefined> {
     if (this.value.length === 0) {
       return piper(undefined);
     }
