@@ -344,6 +344,32 @@ export class ArrayPiper<T> extends Piper<Array<T>> {
     }
     return piper(undefined);
   }
+  
+  minBy(fn: (value: T) => any) {
+    if (this.value.length === 0) {
+      return piper(undefined);
+    }
+    let min = this.value[0];
+    for (let i = 1; i < this.value.length; i++) {
+      if (fn(this.value[i]) < fn(min)) {
+        min = this.value[i];
+      }
+    }
+    return piper(min);
+  }
+
+  maxBy(fn: (value: T) => any) {
+    if (this.value.length === 0) {
+      return piper(undefined);
+    }
+    let max = this.value[0];
+    for (let i = 1; i < this.value.length; i++) {
+      if (fn(this.value[i]) > fn(max)) {
+        max = this.value[i];
+      }
+    }
+    return piper(max);
+  }
     
   
   [index: number]: PiperType<T>;

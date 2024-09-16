@@ -171,6 +171,12 @@ describe("Array", () => {
     expect((await piper([1, 2, 3]).findAwait(async x => Promise.resolve(x === 2))).value).toBe(2);
     expect((await piper([] as number[]).findAwait(async x => Promise.resolve(x === 2))).value as undefined).toBe(undefined);
   })
+  it("minBy", () => {
+    expect(piper([{a: 1}, {a: 2}, {a: 3}]).minBy(x => x.a).value).toEqual({a: 1});
+  })
+  it("maxBy", () => {
+    expect(piper([{a: 1}, {a: 2}, {a: 3}]).maxBy(x => x.a).value).toEqual({a: 3});
+  })
   
   describe("StringArray", () => {
     it("join", () => {

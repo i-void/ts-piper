@@ -4,7 +4,7 @@
   "type": "module",
   "author": "Onur Eren Elibol",
   "license": "CC0-1.0",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "This is a typesafe pipe for TS, but with super helpful predefined methods, it includes almost all the features for arrays, objects and sets.",
   "repository": {
     "type": "git",
