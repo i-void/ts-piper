@@ -26,7 +26,7 @@ export class Piper<T> {
   }
 
   isNone() {
-    return piper(this.isNull() || this.isUndefined());
+    return piper(this.isNull().value || this.isUndefined().value);
   }
 
   isPresent() {
@@ -41,14 +41,14 @@ export class Piper<T> {
   }
 
   whenNone<U>(callback: () => U) {
-    if (this.isNone()) {
+    if (this.isNone().value) {
       callback();
     }
     return this;
   }
 
   ensure(): PiperType<NonNullable<T>> {
-    if (this.isNone()) {
+    if (this.isNone().value) {
       throw new Error('Value is null or undefined');
     }
     return this as any;
