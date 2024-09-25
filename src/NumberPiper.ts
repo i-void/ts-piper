@@ -17,4 +17,9 @@ export class NumberPiper extends Piper<number> {
   isNegative() {
     return piper(this.value < 0);
   }
+  
+  round(precision = 0) {
+    const shifted = this.value * Math.pow(10, precision);
+    return piper(Math.round(shifted) / Math.pow(10, precision));
+  }
 }
