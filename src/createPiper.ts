@@ -19,7 +19,7 @@ export type PiperType<T> =
   T extends Set<number> ? NumberSetPiper:
   T extends Set<infer A> ? SetPiper<A>:
   T extends Map<infer K, infer V> ? MapPiper<K, V>:
-  T extends Record<string, infer V> ? RecordPiper<V>:
+  T extends Record<infer K, infer V> ? RecordPiper<K, V>:
   Piper<T>
 
 // Factory function

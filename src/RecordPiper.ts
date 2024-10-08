@@ -4,21 +4,21 @@ import { piper, type PiperType } from "./createPiper";
 export type MappedItem<K, V> = { key: K, value: V };
 export type MapFn<V, O> = (record: MappedItem<string, V>, index: number) => O;
 
-export class RecordPiper<V> extends Piper<Record<string, V>> {
+export class RecordPiper<K extends string|number|symbol, V> extends Piper<Record<K, V>> {
   map<U>(fn: MapFn<V, U>) {
-    const entries = Object.entries(this.value);
+    const entries = Object.entries<V>(this.value);
     const mapped = entries.map(([key, value], index) => fn({ key, value }, index));
     return piper(mapped)
   }
   
   async mapAwaitAll<U>(fn: MapFn<V, Promise<U>>) {
-    const entries = Object.entries(this.value);
+    const entries = Object.entries<V>(this.value);
     const mapped = await Promise.all(entries.map(async ([key, value], index) => fn({ key, value }, index)));
     return piper(mapped)
   }
   
   async mapAwait<U>(fn: MapFn<V, Promise<U>>) {
-    const entries = Object.entries(this.value);
+    const entries = Object.entries<V>(this.value);
     let result: U[] = [];
     for (let i = 0; i < entries.length; i++) {
       result.push(await fn({ key: entries[i][0], value: entries[i][1] }, i));
@@ -27,7 +27,7 @@ export class RecordPiper<V> extends Piper<Record<string, V>> {
   }
   
   mapValues<U>(fn: MapFn<V, U>) {
-    const entries = Object.entries(this.value);
+    const entries = Object.entries<V>(this.value);
     const mapped = entries.reduce((acc, [key, value], index) => {
       acc[key] = fn({ key, value }, index);
       return acc;
@@ -36,13 +36,13 @@ export class RecordPiper<V> extends Piper<Record<string, V>> {
   }
   
   async mapValuesAwaitAll<U>(fn: MapFn<V, Promise<U>>) {
-    const entries = Object.entries(this.value);
+    const entries = Object.entries<V>(this.value);
     const mapped = await Promise.all(entries.map(async ([key, value], index) => [key, await fn({ value, key }, index)]));
     return piper(Object.fromEntries(mapped))
   }
   
   async mapValuesAwait<U>(fn: MapFn<V, Promise<U>>) {
-    const entries = Object.entries(this.value);
+    const entries = Object.entries<V>(this.value);
     let result: Record<string, U> = {};
     for (let i = 0; i < entries.length; i++) {
       const [key, value] = entries[i];
@@ -52,7 +52,7 @@ export class RecordPiper<V> extends Piper<Record<string, V>> {
   }
   
   mapKeys(fn: MapFn<V, string>) {
-    const entries = Object.entries(this.value);
+    const entries = Object.entries<V>(this.value);
     const mapped = entries.reduce((acc, [key, value], index) => {
       acc[fn({ key, value }, index)] = value;
       return acc;
@@ -61,13 +61,13 @@ export class RecordPiper<V> extends Piper<Record<string, V>> {
   }
   
   async mapKeysAwaitAll(fn: MapFn<V, Promise<string>>) {
-    const entries = Object.entries(this.value);
+    const entries = Object.entries<V>(this.value);
     const mapped = await Promise.all(entries.map(async ([key, value], index) => [await fn({ key, value }, index), value]));
     return piper(Object.fromEntries(mapped))
   }
 
   async mapKeysAwait(fn: MapFn<V, Promise<string>>) {
-    const entries = Object.entries(this.value);
+    const entries = Object.entries<V>(this.value);
     let result: Record<string, V> = {};
     for (let i = 0; i < entries.length; i++) {
       const [key, value] = entries[i];
@@ -77,24 +77,24 @@ export class RecordPiper<V> extends Piper<Record<string, V>> {
   }
 
   filter(fn: MapFn<V, boolean>) {
-    const entries = Object.entries(this.value);
+    const entries = Object.entries<V>(this.value);
     const filtered = entries.filter(([key, value], index) => fn({ key, value }, index));
     return piper(Object.fromEntries(filtered));
   }
   
   reject(fn: MapFn<V, boolean>) {
-    const entries = Object.entries(this.value);
+    const entries = Object.entries<V>(this.value);
     const filtered = entries.filter(([key, value], index) => !fn({ key, value }, index));
     return piper(Object.fromEntries(filtered));
   }
   
   reduce<U>(initialValue: U, fn: (acc: U, record: MappedItem<string, V>, index: number) => U) {
-    const entries = Object.entries(this.value);
+    const entries = Object.entries<V>(this.value);
     return piper(entries.reduce((acc, [key, value], index) => fn(acc, { key, value }, index), initialValue));
   }
   
   async reduceAwait<U>(initialValue: U, fn: (acc: U, record: MappedItem<string, V>, index: number) => Promise<U>) {
-    const entries = Object.entries(this.value);
+    const entries = Object.entries<V>(this.value);
     let acc = initialValue;
     for (let i = 0; i < entries.length; i++) {
       acc = await fn(acc, { key: entries[i][0], value: entries[i][1] }, i);
@@ -103,7 +103,7 @@ export class RecordPiper<V> extends Piper<Record<string, V>> {
   }
   
   omitKeys(...keys: string[]) {
-    const entries = Object.entries(this.value);
+    const entries = Object.entries<V>(this.value);
     const filtered = entries.filter(([key, _]) => !keys.includes(key));
     return piper(Object.fromEntries(filtered));
   }
@@ -112,7 +112,7 @@ export class RecordPiper<V> extends Piper<Record<string, V>> {
   }
   
   omitValues(...values: V[]) {
-    const entries = Object.entries(this.value);
+    const entries = Object.entries<V>(this.value);
     const filtered = entries.filter(([_, value]) => !values.includes(value));
     return piper(Object.fromEntries(filtered));
   }
@@ -121,7 +121,7 @@ export class RecordPiper<V> extends Piper<Record<string, V>> {
   }
   
   omitEntries(...entries: [string, V][]) {
-    const entryData = Object.entries(this.value);
+    const entryData = Object.entries<V>(this.value);
     const filtered = entryData.filter(([key, value]) => !entries.some(([k, v]) => k === key && v === value));
     return piper(Object.fromEntries(filtered));
   }
@@ -138,29 +138,29 @@ export class RecordPiper<V> extends Piper<Record<string, V>> {
   }
   
   entries() {
-    return piper(Object.entries(this.value));
+    return piper(Object.entries<V>(this.value));
   }
 
-  valuesOf(...keys: string[]) {
+  valuesOf(...keys: K[]) {
     return piper(keys.map(key => this.value[key]));
   }
 
-  valueOf(key: string) {
+  valueOf(key: K) {
     return piper(this.value[key]);
   }
  
   any(fn: MapFn<V, boolean>) {
-    const entries = Object.entries(this.value);
+    const entries = Object.entries<V>(this.value);
     return piper(entries.some(([key, value], index) => fn({ key, value }, index)));
   }
 
   all(fn: MapFn<V, boolean>) {
-    const entries = Object.entries(this.value);
+    const entries = Object.entries<V>(this.value);
     return piper(entries.every(([key, value], index) => fn({ key, value }, index)));
   }
 
   none(fn: MapFn<V, boolean>) {
-    const entries = Object.entries(this.value);
+    const entries = Object.entries<V>(this.value);
     return piper(!entries.some(([key, value], index) => fn({ key, value }, index)));
   }
   
@@ -173,19 +173,19 @@ export class RecordPiper<V> extends Piper<Record<string, V>> {
   }
 
   forEach(fn: MapFn<V, any>) {
-    const entries = Object.entries(this.value);
+    const entries = Object.entries<V>(this.value);
     entries.forEach(([key, value], index) => fn({ key, value }, index));
   }
   
   async forEachAwait(fn: MapFn<V, Promise<any>>) {
-    const entries = Object.entries(this.value);
+    const entries = Object.entries<V>(this.value);
     for (let i = 0; i < entries.length; i++) {
       await fn({ key: entries[i][0], value: entries[i][1] }, i);
     }
   }
 
   compact() {
-    const entries = Object.entries(this.value);
+    const entries = Object.entries<V>(this.value);
     const filtered = entries.filter(([_, value]) => value !== undefined && value !== null);
     return piper(Object.fromEntries(filtered));
   }
@@ -199,13 +199,13 @@ export class RecordPiper<V> extends Piper<Record<string, V>> {
   }
 
   find(fn: MapFn<V, boolean>): PiperType<readonly[string, V] | undefined> {
-    const entries = Object.entries(this.value);
+    const entries = Object.entries<V>(this.value);
     const found = entries.find(([key, value], index) => fn({ key, value }, index)) as readonly [string, V] | undefined;
     return piper(found)
   }
   
   async findAwait(fn: MapFn<V, Promise<boolean>>): Promise<PiperType<readonly[string, V] | undefined>> {
-    const entries = Object.entries(this.value);
+    const entries = Object.entries<V>(this.value);
     for (let i = 0; i < entries.length; i++) {
       if (await fn({ key: entries[i][0], value: entries[i][1] }, i)) {
         return piper(entries[i] as readonly [string, V]);
