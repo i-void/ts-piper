@@ -370,9 +370,6 @@ export class ArrayPiper<T> extends Piper<Array<T>> {
     }
     return piper(max);
   }
-    
-  
-  [index: number]: PiperType<T>;
 }
 
 export class StringArrayPiper extends ArrayPiper<string> {

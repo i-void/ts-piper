@@ -11,6 +11,14 @@ export class Piper<T> {
   do<U>(callback: (value: T) => U) {
     return piper(callback(this.value));
   }
+  
+  doIf<TR, FR>({ condition, trueFn, falseFn }: { condition: (value: T) => boolean, trueFn: (value: T) => TR, falseFn: (value: T) => FR }) {
+    if (condition(this.value)) {
+      return piper(trueFn(this.value));
+    } else {
+      return piper(falseFn(this.value));
+    }
+  }
 
   debug() {
     console.log(this.value);
@@ -33,14 +41,22 @@ export class Piper<T> {
     return piper(!this.isNone());
   }
 
-  whenPresent<U>(callback: (value: NonNullable<T>) => U) {
+  existance<TR, FR>({ trueFn, falseFn }: { trueFn: (v: T) => TR, falseFn: (v: T) => FR }) {
+    if (this.isPresent().value) {
+      return piper(trueFn(this.value));
+    } else {
+      return piper(falseFn(this.value));
+    }
+  }
+
+  presentSideEffect<U>(callback: (value: NonNullable<T>) => U) {
     if (isPresent(this.value)) {
       callback(this.value);
     }
     return this;
   }
 
-  whenNone<U>(callback: () => U) {
+  noneSideEffect<U>(callback: () => U) {
     if (this.isNone().value) {
       callback();
     }
@@ -52,31 +68,5 @@ export class Piper<T> {
       throw new Error('Value is null or undefined');
     }
     return this as any;
-  }
-
-  proxied() {
-    return new Proxy(this, {
-      get: function (target, prop, receiver) {
-        if (prop in target) {
-          return (target as any)[prop];
-        }
-
-        if (typeof target.value === 'object' && target.value !== null && prop in target.value) {
-          const result = (target.value as any)[prop];
-          return prop === 'value' ? result : piper(result);
-        }
-        if (typeof target.value[prop as keyof T] === 'function') {
-          return function (...args: any[]) {
-            return (target.value[prop as keyof T] as Function).apply(target.value, args);
-          };
-        }
-
-        const indexProp = parseInt(prop.toString())
-        if (isSet(target.value) && isNumber(indexProp)) {
-          return piper([...target.value][indexProp]);
-        }
-        return target.value[prop as keyof T];
-      }
-    }) as typeof this & T;
   }
 }

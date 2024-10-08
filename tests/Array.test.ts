@@ -117,9 +117,6 @@ describe("Array", () => {
   it("nth", () => {
     expect(piper([1, 2, 3]).nth(1).value).toBe(2);
   })
-  it("get", () => {
-    expect(piper([1, 2, 3])[1].value).toBe(2);
-  })
   it("flatten", () => {
     expect(piper([1, [2, [3]]]).flatten().value).toEqual([1, 2, [3]]);
     expect(piper([1, [2, [3]]]).flatten(2).value).toEqual([1, 2, 3]);

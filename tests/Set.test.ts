@@ -123,9 +123,6 @@ describe("Set", () => {
   it("groupBy", () => {
     expect(piper(new Set([1, 2, 3])).groupBy(x => x % 2).value).toEqual(new Map([[1, [1, 3]], [0, [2]]]));
   })
-  it("get", () => {
-    expect(piper(new Set([1, 2, 3]))[2].value).toBe(3);
-  })
   it("find", () => {
     expect(piper(new Set([1, 2, 3])).find(x => x > 2).value).toBe(3);
   })
