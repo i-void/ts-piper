@@ -7,8 +7,11 @@ import { RecordPiper } from "./RecordPiper";
 import { NumberSetPiper, SetPiper, StringSetPiper } from "./SetPiper";
 import { StringPiper } from "./StringPiper";
 import { isBool, isMap, isNumber, isRecord, isString } from "./typeChecks";
+import { Dict } from "./Dict";
+import { DictPiper } from "./DictPiper";
 
 export type PiperType<T> =
+  T extends Dict<infer K, infer V> ? DictPiper<K, V> :
   T extends boolean ? BooleanPiper :
   T extends string ? StringPiper :
   T extends number ? NumberPiper :
@@ -26,6 +29,8 @@ export type PiperType<T> =
 export function piper<T>(value: T): PiperType<T> {
   if (isBool(value)) {
     return new BooleanPiper(value) as any;
+  } else if (value instanceof Dict) {
+    return new DictPiper(value) as any
   } else if (isString(value)) {
     return new StringPiper(value) as any;
   } else if (isNumber(value)) {
