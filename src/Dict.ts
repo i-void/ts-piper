@@ -1,3 +1,5 @@
+import { Tuple2 } from "./Tuple2";
+
 export class Dict<K, V> {
   entries: [K, V][];
 
@@ -9,6 +11,10 @@ export class Dict<K, V> {
     return new Dict(entries);
   }
   
+  static fromTuples<K, V>(tuples: Tuple2<K, V>[]) {
+    return new Dict(tuples.map(tuple => tuple.toArray()));
+  }
+
   static fromMap<K, V>(map: Map<K, V>) {
     return new Dict(Array.from(map.entries()));
   }
@@ -92,7 +98,7 @@ export class Dict<K, V> {
     if (!found) {
       return undefined;
     }
-    return new Dict(Array(found));
+    return Tuple2.from(found);
   }
 
   last() {
@@ -100,7 +106,7 @@ export class Dict<K, V> {
     if (!found) {
       return undefined;
     }
-    return new Dict(Array(found));
+    return Tuple2.from(found);
   }
 
   select(fn: (record: { key: K, value: V }, index: number) => boolean) {
@@ -134,13 +140,13 @@ export class Dict<K, V> {
     if (!found) {
       return undefined
     }
-    return new Dict(Array(found));
+    return Tuple2.from(found);
   }
   
   async findAsync(fn: (record: { key: K, value: V }, index: number) => Promise<boolean>) {
     for (let i = 0; i < this.entries.length; i++) {
       if (await fn({ key: this.entries[i][0], value: this.entries[i][1] }, i)) {
-        return new Dict(Array(this.entries[i]));
+        return Tuple2.from(this.entries[i]);
       }
     }
     return undefined;
@@ -151,7 +157,7 @@ export class Dict<K, V> {
     const results = await Promise.all(functions);
     for (let i = 0; i < results.length; i++) {
       if (results[i]) {
-        return new Dict(Array(this.entries[i]));
+        return Tuple2.from(this.entries[i]);
       }
     }
     return undefined;
@@ -313,6 +319,10 @@ export class Dict<K, V> {
     return this.reduce(0, (acc, { value }) => acc + value); 
   }
   
+  average(this: Dict<K, number>) {
+    return this.sum() / this.length();
+  }
+  
   reduce<U>(initialValue: U, fn: (acc: U, record: { key: K, value: V }, index: number) => U) {
     return this.entries.reduce((acc, [key, value], index) => fn(acc, { key, value }, index), initialValue);
   }
@@ -344,28 +354,6 @@ export class Dict<K, V> {
   keysOf(values: V[]) {
     return this.select(({ value }) => values.includes(value)).keys();
   }
-
-  key() {
-    const found = this.entries[0];
-    if (!found) {
-      return undefined;
-    }
-    if (this.entries.length > 1) {
-      throw new Error("More than one key found");
-    }
-    return found[0];
-  }
-
-  value() {
-    const found = this.entries[0];
-    if (!found) {
-      return undefined;
-    }
-    if (this.entries.length > 1) {
-      throw new Error("More than one value found");
-    }
-    return found[1];
-  }
   
   get(key: K) {
     return this.entries.find(([k]) => k === key)?.[1];
@@ -375,7 +363,6 @@ export class Dict<K, V> {
     const newEntries = this.entries.map(([k, v]) => (k === key ? [k, value] : [k, v]) as [K, V]);
     return new Dict(newEntries);
   }
-  
   
   mapValuesWhen(condFn: (record: { key: K, value: V }, index: number) => boolean, mapFn: (record: { key: K, value: V }, index: number) => V) {
     return this.mapValues((record, index) => (condFn(record, index) ? mapFn(record, index) : record.value));

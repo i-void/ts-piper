@@ -1,5 +1,6 @@
 import { describe, it, expect } from "bun:test"
 import { Dict } from "../src/Dict"
+import { Tuple2 } from "../src/Tuple2";
 
 describe("Dict", () => {
   it("from", () => {
@@ -46,10 +47,10 @@ describe("Dict", () => {
     expect(await Dict.from({ a: 1, b: 2 }).mapKeysAsyncAll(async ({ key, value }) => key + value)).toEqual(Dict.from({ a1: 1, b2: 2 }));
   })
   it("first", () => {
-    expect(Dict.from({ a: 1, b: 2 }).first()).toEqual(Dict.from({ a: 1 }));
+    expect(Dict.from({ a: 1, b: 2 }).first()).toEqual(Tuple2.new("a", 1));
   })
   it("last", () => {
-    expect(Dict.from({ a: 1, b: 2 }).last()).toEqual(Dict.from({ b: 2 }));
+    expect(Dict.from({ a: 1, b: 2 }).last()).toEqual(Tuple2.new("b", 2));
   })
   it("select", () => {
     expect(Dict.from({ a: 1, b: 2 }).select(({ key, value }) => key === 'a')).toEqual(Dict.from({ a: 1 }));
@@ -61,13 +62,13 @@ describe("Dict", () => {
     expect(await Dict.from({ a: 1, b: 2 }).selectAsyncAll(async ({ key, value }) => key === 'a')).toEqual(Dict.from({ a: 1 }));
   })
   it("find", () => {
-    expect(Dict.from({ a: 1, b: 2 }).find(({ key, value }) => key === 'a')).toEqual(Dict.from({ a: 1 }));
+    expect(Dict.from({ a: 1, b: 2 }).find(({ key, value }) => key === 'a')).toEqual(Tuple2.new("a", 1));
   })
   it("findAsync", async () => {
-    expect(await Dict.from({ a: 1, b: 2 }).findAsync(async ({ key, value }) => key === 'a')).toEqual(Dict.from({ a: 1 }));
+    expect(await Dict.from({ a: 1, b: 2 }).findAsync(async ({ key, value }) => key === 'a')).toEqual(Tuple2.new("a", 1));
   })
   it("findAsyncAll", async () => {
-    expect(await Dict.from({ a: 1, b: 2 }).findAsyncAll(async ({ key, value }) => key === 'a')).toEqual(Dict.from({ a: 1 }));
+    expect(await Dict.from({ a: 1, b: 2 }).findAsyncAll(async ({ key, value }) => key === 'a')).toEqual(Tuple2.new("a", 1));
   })
   it("sort", () => {
     expect(Dict.from({ b: 2, a: 1 }).sort()).toEqual(Dict.from({ a: 1, b: 2 }));
@@ -194,12 +195,6 @@ describe("Dict", () => {
   it("keysOf", () => {
     expect(Dict.from({ a: 1, b: 2 }).keysOf([1])).toEqual(["a"]);
   })
-  it("key", () => {
-    expect(Dict.from({ a: 1 }).key()).toBe("a");
-  })
-  it("value", () => {
-    expect(Dict.from({ a: 1 }).value()).toBe(1);
-  })
   it("get", () => {
     expect(Dict.from({ a: 1, b: 2 }).get("a")).toBe(1);
   }),
@@ -224,5 +219,8 @@ describe("Dict", () => {
   })
   it("merge", () => {
     expect(Dict.from<string, number>({ a: 1, b: 2 }).merge(Dict.from({ c: 3 }))).toEqual(Dict.from({ a: 1, b: 2, c: 3 }));
+  })
+  it("average", () => {
+    expect(Dict.from({ a: 1, b: 2 }).average()).toBe(1.5);
   })
 })
